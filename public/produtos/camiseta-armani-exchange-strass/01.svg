@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1600" width="1200" height="1600" role="img" aria-label="Camiseta Armani Exchange Strass">
+  <defs>
+    <linearGradient id="fundo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#24272b"/>
+      <stop offset="1" stop-color="#1b1e21"/>
+    </linearGradient>
+    <pattern id="grade" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0 L0 0 0 40" fill="none" stroke="#c8a558" stroke-width="0.4" opacity="0.07"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="1600" fill="url(#fundo)"/>
+  <rect width="1200" height="1600" fill="url(#grade)"/>
+  <rect x="48" y="48" width="1104" height="1504" fill="none" stroke="#7a6535" stroke-width="1" opacity="0.55"/>
+
+  <text x="96" y="140" fill="#c8a558" font-family="Georgia, serif" font-size="22" letter-spacing="10">KAUÃ STYLE</text>
+  <text x="1104" y="140" fill="#7a6535" font-family="Georgia, serif" font-size="20" letter-spacing="4" text-anchor="end">ARMANI EXCHANGE</text>
+  <line x1="96" y1="168" x2="1104" y2="168" stroke="#7a6535" stroke-width="1" opacity="0.6"/>
+
+  <g transform="translate(310 340) scale(1.45)" fill="none" stroke="#c8a558" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" opacity="0.92">
+    <path d="M120 96 L170 72 Q200 104 230 72 L280 96 L330 140 L296 182 L276 164 L276 424 Q200 438 124 424 L124 164 L104 182 L70 140 Z"/>
+  </g>
+
+  
+
+  <text x="96" y="1128" fill="#f2efe8" font-family="Georgia, serif" font-size="46">Camiseta Armani Exchange Strass</text>
+  <text x="96" y="1168" fill="#9b958a" font-family="Georgia, serif" font-size="22">Logo A|X cravejado, malha fria com leve brilho.</text>
+  
+    <text x="96" y="1218" fill="#7a6535" font-family="Georgia, serif" font-size="19" letter-spacing="3">PEÇA</text>
+    <text x="1104" y="1218" fill="#d9d4cb" font-family="Georgia, serif" font-size="22" text-anchor="end">camisetas</text>
+    <line x1="96" y1="1236" x2="1104" y2="1236" stroke="#7a6535" stroke-width="0.6" stroke-dasharray="2 6" opacity="0.5"/>
+    <text x="96" y="1272" fill="#7a6535" font-family="Georgia, serif" font-size="19" letter-spacing="3">TAMANHOS</text>
+    <text x="1104" y="1272" fill="#d9d4cb" font-family="Georgia, serif" font-size="22" text-anchor="end">P · M · G · GG</text>
+    <line x1="96" y1="1290" x2="1104" y2="1290" stroke="#7a6535" stroke-width="0.6" stroke-dasharray="2 6" opacity="0.5"/>
+    <text x="96" y="1326" fill="#7a6535" font-family="Georgia, serif" font-size="19" letter-spacing="3">CORES</text>
+    <text x="1104" y="1326" fill="#d9d4cb" font-family="Georgia, serif" font-size="22" text-anchor="end">Preto</text>
+    <line x1="96" y1="1344" x2="1104" y2="1344" stroke="#7a6535" stroke-width="0.6" stroke-dasharray="2 6" opacity="0.5"/>
+  <circle cx="96" cy="1438" r="15" fill="#141414" stroke="#7a6535" stroke-width="1.5"/>
+  <text x="1104" y="1446" fill="#7a6535" font-family="Georgia, serif" font-size="18" letter-spacing="4" text-anchor="end">FICHA 01</text>
+</svg>

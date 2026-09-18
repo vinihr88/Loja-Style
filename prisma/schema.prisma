@@ -1,0 +1,274 @@
+// Dinheiro sempre em centavos (Int). Nada de float em preço.
+// SQLite não suporta enum no Prisma: os status vivem como String,
+// com as constantes em src/lib/constantes.ts.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id         String   @id @default(cuid())
+  nome       String
+  email      String   @unique
+  senhaHash  String
+  telefone   String?
+  admin      Boolean  @default(false)
+  criadoEm   DateTime @default(now())
+
+  sessoes    Sessao[]
+  enderecos  Endereco[]
+  pedidos    Pedido[]
+  favoritos  Favorito[]
+  avaliacoes Avaliacao[]
+  tokens     TokenRecuperacao[]
+}
+
+model Sessao {
+  id        String   @id @default(cuid())
+  jti       String   @unique
+  usuarioId String
+  criadaEm  DateTime @default(now())
+  expiraEm  DateTime
+
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId])
+}
+
+// Guarda só o hash do token. Uso único, expira em 1 hora.
+model TokenRecuperacao {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  usuarioId String
+  expiraEm  DateTime
+  usadoEm   DateTime?
+  criadoEm  DateTime @default(now())
+
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+}
+
+model Endereco {
+  id          String  @id @default(cuid())
+  usuarioId   String
+  apelido     String  @default("Principal")
+  destinatario String
+  cep         String
+  logradouro  String
+  numero      String
+  complemento String?
+  bairro      String
+  cidade      String
+  uf          String
+  padrao      Boolean @default(false)
+
+  usuario     Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId])
+}
+
+model Categoria {
+  id       String    @id @default(cuid())
+  nome     String
+  slug     String    @unique
+  ordem    Int       @default(0)
+  produtos Produto[]
+}
+
+model Colecao {
+  id        String    @id @default(cuid())
+  nome      String
+  slug      String    @unique
+  descricao String?
+  destaque  Boolean   @default(false)
+  ordem     Int       @default(0)
+  produtos  Produto[]
+}
+
+model Produto {
+  id                        String   @id @default(cuid())
+  nome                      String
+  slug                      String   @unique
+  descricao                 String
+  resumo                    String
+  marca                     String?
+  precoCentavos             Int
+  precoPromocionalCentavos  Int?
+  categoriaId               String
+  ativo                     Boolean  @default(true)
+  destaque                  Boolean  @default(false)
+  lancamento                Boolean  @default(false)
+  criadoEm                  DateTime @default(now())
+  atualizadoEm              DateTime @updatedAt
+
+  categoria   Categoria     @relation(fields: [categoriaId], references: [id])
+  colecoes    Colecao[]
+  imagens     ImagemProduto[]
+  variantes   Variante[]
+  avaliacoes  Avaliacao[]
+  favoritos   Favorito[]
+
+  @@index([categoriaId])
+  @@index([ativo])
+}
+
+model ImagemProduto {
+  id        String  @id @default(cuid())
+  produtoId String
+  url       String
+  alt       String
+  ordem     Int     @default(0)
+
+  produto   Produto @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+
+  @@index([produtoId])
+}
+
+// Variantes são atualizadas, nunca recriadas: ItemPedido aponta para cá.
+model Variante {
+  id        String  @id @default(cuid())
+  produtoId String
+  tamanho   String
+  cor       String
+  corHex    String  @default("#111111")
+  sku       String  @unique
+  estoque   Int     @default(0)
+  ativo     Boolean @default(true)
+
+  produto   Produto      @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+  itens     ItemPedido[]
+
+  @@unique([produtoId, tamanho, cor])
+  @@index([produtoId])
+}
+
+model Cupom {
+  id             String    @id @default(cuid())
+  codigo         String    @unique
+  tipo           String // PERCENTUAL | VALOR
+  valor          Int // percentual (1-90) ou centavos
+  minimoCentavos Int       @default(0)
+  maxUsos        Int?
+  usos           Int       @default(0)
+  expiraEm       DateTime?
+  ativo          Boolean   @default(true)
+  criadoEm       DateTime  @default(now())
+}
+
+model Pedido {
+  id                String   @id @default(cuid())
+  numero            String   @unique
+  usuarioId         String?
+  nome              String
+  email             String
+  telefone          String
+  cpf               String
+
+  status            String   @default("AGUARDANDO_PAGAMENTO")
+  subtotalCentavos  Int
+  descontoCentavos  Int      @default(0)
+  freteCentavos     Int      @default(0)
+  totalCentavos     Int
+  cupomCodigo       String?
+
+  envioMetodo       String
+  envioPrazoDias    Int
+  cep               String
+  logradouro        String
+  numero_           String
+  complemento       String?
+  bairro            String
+  cidade            String
+  uf                String
+
+  pagamentoId       String?
+  pagamentoStatus   String?
+  pagamentoMetodo   String?
+  pagoEm            DateTime?
+  estoqueBaixado    Boolean  @default(false)
+  rastreioCodigo    String?
+
+  criadoEm          DateTime @default(now())
+  atualizadoEm      DateTime @updatedAt
+
+  usuario Usuario?      @relation(fields: [usuarioId], references: [id])
+  itens   ItemPedido[]
+  eventos EventoPedido[]
+
+  @@index([usuarioId])
+  @@index([status])
+  @@index([pagamentoId])
+}
+
+// Snapshot: editar a peça depois não reescreve o histórico.
+model ItemPedido {
+  id            String  @id @default(cuid())
+  pedidoId      String
+  varianteId    String?
+  produtoNome   String
+  produtoSlug   String
+  tamanho       String
+  cor           String
+  imagemUrl     String?
+  precoCentavos Int
+  quantidade    Int
+
+  pedido   Pedido    @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+  variante Variante? @relation(fields: [varianteId], references: [id])
+
+  @@index([pedidoId])
+}
+
+model EventoPedido {
+  id        String   @id @default(cuid())
+  pedidoId  String
+  status    String
+  descricao String
+  criadoEm  DateTime @default(now())
+
+  pedido    Pedido   @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+
+  @@index([pedidoId])
+}
+
+model Avaliacao {
+  id         String   @id @default(cuid())
+  produtoId  String
+  usuarioId  String?
+  nome       String
+  nota       Int
+  comentario String
+  aprovada   Boolean  @default(false)
+  criadoEm   DateTime @default(now())
+
+  produto Produto  @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+  usuario Usuario? @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+
+  @@index([produtoId])
+}
+
+model Favorito {
+  id        String   @id @default(cuid())
+  usuarioId String
+  produtoId String
+  criadoEm  DateTime @default(now())
+
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  produto Produto @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+
+  @@unique([usuarioId, produtoId])
+}
+
+model Contato {
+  id       String   @id @default(cuid())
+  nome     String
+  email    String
+  assunto  String
+  mensagem String
+  lida     Boolean  @default(false)
+  criadoEm DateTime @default(now())
+}

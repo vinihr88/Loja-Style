@@ -1,0 +1,19 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  # Next 15 exige Node 18.18+; fixamos 20 para bater com o ambiente local.
+  NODE_VERSION = "20"
+  # O Prisma precisa do engine de Linux da Lambda, não do binário do Windows.
+  PRISMA_CLI_BINARY_TARGETS = "rhel-openssl-3.0.x"
+
+# Adapta o App Router, as rotas de API e o middleware para as funções do Netlify.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# O webhook do Mercado Pago precisa chegar inteiro na função, sem cache.
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Cache-Control = "no-store"
