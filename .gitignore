@@ -12,3 +12,6 @@ next-env.d.ts
 fotos-originais/
 tsconfig.tsbuildinfo
 .claude/
+
+# Local Netlify folder
+.netlify
